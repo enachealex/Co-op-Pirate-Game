@@ -46,7 +46,7 @@ func _draw() -> void:
 			var fan := PackedVector2Array([pos])
 			for i in 17:
 				fan.append(pos + Vector2.from_angle(lerpf(a0, a1, i / 16.0)) * fill_r)
-			draw_colored_polygon(fan, Color(col, 0.07 if ready else 0.035))
+			draw_colored_polygon(fan, Color(col, 0.055 if ready else 0.03))
 		draw_arc(pos, r, a0, a1, 24, Color(col, 0.5 if ready else 0.16), 2.0, true)
 		draw_line(pos + Vector2.from_angle(a0) * ship.beam() * 0.6, pos + Vector2.from_angle(a0) * r, Color(col, 0.16), 1.0, true)
 		draw_line(pos + Vector2.from_angle(a1) * ship.beam() * 0.6, pos + Vector2.from_angle(a1) * r, Color(col, 0.16), 1.0, true)

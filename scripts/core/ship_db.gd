@@ -106,7 +106,7 @@ const ENEMIES := {
 
 # Named bounty captains, in order. All names are original to this project.
 const BOUNTIES := [
-	{"captain": "Silas Crane", "ship": "The Gannet", "template": "brig", "hp_mult": 1.8, "escorts": ["cutter"], "reward": 450},
+	{"captain": "Silas Crane", "ship": "Grey Gannet", "template": "brig", "hp_mult": 1.8, "escorts": ["cutter"], "reward": 450},
 	{"captain": "Mad Orla Venn", "ship": "Widow's Wake", "template": "frigate", "hp_mult": 1.5, "escorts": ["cutter", "cutter"], "reward": 700},
 	{"captain": "Commodore Ashby", "ship": "Steadfast", "template": "frigate", "hp_mult": 2.0, "escorts": ["brig", "cutter"], "reward": 950},
 	{"captain": "The Brothers Rook", "ship": "Twin Gallows", "template": "manowar", "hp_mult": 1.2, "escorts": ["brig", "brig"], "reward": 1300},

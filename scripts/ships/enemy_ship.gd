@@ -463,6 +463,26 @@ func _heading_out_ok() -> bool:
 	return state == AI.PATROL and not lane.is_empty() and wp >= lane.size() - 1 and not loop_lane
 
 
+## Leave the sector via the nearest edge (used when a bounty captain falls).
+func retreat() -> void:
+	var p := global_position
+	var sz := U.WORLD_SIZE
+	var m := 280.0
+	var options := [Vector2(p.x, m), Vector2(p.x, sz.y - m), Vector2(m, p.y), Vector2(sz.x - m, p.y)]
+	var best: Vector2 = options[0]
+	for o in options:
+		if p.distance_to(o) < p.distance_to(best):
+			best = o
+	var route: Array[Vector2] = [best]
+	lane = route
+	wp = 0
+	loop_lane = false
+	role = "escort" if role != "merchant" else role
+	if not disabled:
+		target = null
+		state = AI.PATROL
+
+
 # --- Rewards --------------------------------------------------------------------------------
 
 func _on_sunk(info: Dictionary) -> void:

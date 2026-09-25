@@ -205,8 +205,8 @@ func _process(delta: float) -> void:
 				_step = 15
 		15:
 			if _t > duration + 0.5:
-				_summary()
-				get_tree().quit()
+				var failed := _summary()
+				get_tree().quit(1 if failed > 0 else 0)
 
 
 func _check(what: String, ok: bool) -> void:
@@ -258,7 +258,8 @@ func _test_dismast_and_tow() -> void:
 	_check("tow-line attached", p1.tow_target == p2 and p2.towed_by == p1)
 
 
-func _summary() -> void:
+## Prints the run summary and returns the number of failed checks.
+func _summary() -> int:
 	var w: World = main.world
 	print("[autotest] ---- summary ----")
 	print("[autotest] game time %.1fs, treasury %d, total sunk %d, notoriety %d" % [w.time, GameManager.treasury, GameManager.total_sunk, GameManager.notoriety])
@@ -274,3 +275,4 @@ func _summary() -> void:
 		if l.contains("FAIL"):
 			fails += 1
 	print("[autotest] result: %s (%d checks, %d failed)" % ["OK" if fails == 0 else "FAILED", _log.size(), fails])
+	return fails

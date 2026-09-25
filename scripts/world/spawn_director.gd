@@ -18,6 +18,11 @@ class Group:
 				s.on_group_alert(t)
 
 	func on_member_lost(s: Node) -> void:
+		if kind == "bounty" and s.is_bounty:
+			# The captain is gone: the escorts break off and run for the sector edge.
+			for o in ships:
+				if is_instance_valid(o) and o != s and not o.sinking:
+					o.retreat()
 		if s == leader:
 			leader = null
 			for o in ships:
@@ -77,7 +82,11 @@ func tick(dt: float) -> void:
 	if convoys < max_convoys() and _convoy_timer <= 0.0:
 		spawn_convoy()
 		_convoy_timer = _rng.randf_range(10.0, 20.0)
-	if GameManager.notoriety >= 2:
+	var hunter_groups := 0
+	for g in groups:
+		if g.kind == "hunters":
+			hunter_groups += 1
+	if GameManager.notoriety >= 2 and hunter_groups < 1 + int(GameManager.notoriety / 3):
 		_hunter_timer -= dt
 		if _hunter_timer <= 0.0:
 			_hunter_timer = maxf(60.0, 150.0 - 15.0 * GameManager.notoriety)
@@ -200,7 +209,7 @@ func spawn_bounty() -> void:
 	g.leader = boss
 	groups.append(g)
 	bounty_ship = boss
-	GameManager.banner.emit("NEW BOUNTY", "%s aboard the %s  -  %s gold" % [b["captain"], b["ship"], U.fmt_gold(int(b["reward"]))])
+	GameManager.banner.emit("NEW BOUNTY", "%s aboard the %s  -  %s gold reward" % [b["captain"], b["ship"], U.fmt_gold(int(b["reward"]))])
 
 
 func _edge_point() -> Vector2:

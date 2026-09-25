@@ -44,7 +44,8 @@ func spawn(pos: Vector2, kind: int, value: int, burst: float = 60.0) -> void:
 
 ## Scatter the loot of a sunk ship.
 func drop_for(pos: Vector2, crate_count: int, gold_value: int, rich: bool) -> void:
-	spawn(pos, Kind.GOLD, gold_value, 50.0)
+	if gold_value > 0:
+		spawn(pos, Kind.GOLD, gold_value, 50.0)
 	for i in crate_count:
 		var v := _rng.randi_range(35, 70) * (2 if rich else 1)
 		spawn(pos, Kind.CARGO, v, 90.0)

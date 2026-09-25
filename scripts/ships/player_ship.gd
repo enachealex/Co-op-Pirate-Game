@@ -39,8 +39,8 @@ func setup(p_idx: int, p_input: PlayerInput, p_profile, p_world: Node) -> void:
 	world = p_world
 	team = U.Team.PLAYER
 	var col: Color = U.PLAYER_COLORS[idx]
-	sail_color = col.lerp(Color.WHITE, 0.12)
-	stripe_color = Color("f7f1e3")
+	sail_color = col
+	stripe_color = col.darkened(0.45)
 	flag_color = col
 	hull_color = Color("6a4226") if idx == 0 else Color("5b4030")
 	display_name = U.PLAYER_NAMES[idx]

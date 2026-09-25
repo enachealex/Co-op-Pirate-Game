@@ -187,7 +187,10 @@ func _draw_reload_gauge(col: Color) -> void:
 		var lbl := "PORT [%s]" % ship.input.glyph("fire_port") if side == "port" else "STBD [%s]" % ship.input.glyph("fire_starboard")
 		var lx := r.position.x + 10 if sx < 0 else r.end.x - 10 - _text_w(lbl, 13, true)
 		_text(lbl, Vector2(lx, r.position.y + 18), 13, Color.WHITE if ready else Color(1, 1, 1, 0.5), true)
-		_text("READY" if ready else "%.1fs" % (bat.timer * ship.reload_mult), Vector2(lx, r.position.y + 36), 15, Color(col) if ready else Color(1, 1, 1, 0.6), true)
+		var status := "READY" if ready else "%.1fs" % (bat.timer * ship.reload_mult)
+		if ship.dismasted:
+			status = "DOWN"
+		_text(status, Vector2(lx, r.position.y + 36), 15, Color(col) if ready else Color(1, 1, 1, 0.6), true)
 	var bow: Battery = ship.batteries["bow"]
 	if bow.count > 0:
 		var bar2 := Rect2(c + Vector2(-20, -54), Vector2(40, 8))
@@ -309,7 +312,7 @@ func _draw_offscreen_markers() -> void:
 	var margin := 40.0
 	for it in items:
 		var sp: Vector2 = ((it[0] as Vector2) - center) * cam.zoom / ui_scale + size * 0.5
-		var inner := Rect2(Vector2(margin, margin + 150), size - Vector2(margin * 2, margin * 2 + 150 + 120))
+		var inner := Rect2(Vector2(margin, 190.0), Vector2(size.x - margin * 2, size.y - 190.0 - 270.0))
 		if inner.has_point(sp):
 			continue
 		var dirv := (sp - size * 0.5).normalized()
@@ -382,7 +385,7 @@ func _draw_banner() -> void:
 	if _banner_t <= 0.0:
 		return
 	var a := clampf(_banner_t, 0.0, 1.0) * clampf((4.5 - _banner_t) * 4.0, 0.0, 1.0)
-	var y := size.y * 0.2
+	var y := size.y * 0.42
 	var w := maxf(_text_w(_banner, 40, true), _text_w(_banner_sub, 18)) + 60
 	draw_rect(Rect2(size.x * 0.5 - w * 0.5, y - 46, w, 80), Color(0.04, 0.05, 0.08, 0.7 * a))
 	draw_rect(Rect2(size.x * 0.5 - w * 0.5, y - 46, w, 80), Color(0.9, 0.75, 0.4, 0.8 * a), false, 2.0)

@@ -497,8 +497,8 @@ func _draw_sail(mx: float, L: float, B: float, alpha: float) -> void:
 		draw_line(Vector2(mx, -S * 0.45), Vector2(mx, S * 0.45), Color(sail_color.darkened(0.1), alpha), 5.0)
 		draw_line(Vector2(mx, -S * 0.5), Vector2(mx, S * 0.5), yard, 2.0)
 		return
-	var bulge := L * 0.1 * fill
-	var depth := 5.0 + 5.0 * absf(fill)
+	var bulge := L * 0.12 * fill
+	var depth := 9.0 + 7.0 * absf(fill)
 	var steps := 10
 	var front := PackedVector2Array()
 	var back := PackedVector2Array()

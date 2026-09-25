@@ -1,0 +1,33 @@
+name: Smoke test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  headless-autotest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GODOT_VERSION: 4.4.1
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Godot
+        run: |
+          curl -sSL -o godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q godot.zip
+          mv "Godot_v${GODOT_VERSION}-stable_linux.x86_64" godot
+          chmod +x godot
+
+      - name: Import project (parses every script)
+        run: |
+          ./godot --headless --path . --import 2>&1 | tee import.log
+          if grep -q "SCRIPT ERROR" import.log; then echo "::error::GDScript errors during import"; exit 1; fi
+
+      - name: Run bot-driven autotest (90 s of game time)
+        run: |
+          set -o pipefail
+          ./godot --headless --path . --fixed-fps 60 -- --autotest --duration=90 2>&1 | tee autotest.log
+          if grep -q "SCRIPT ERROR" autotest.log; then echo "::error::Runtime script errors"; exit 1; fi
+          grep -q "\[autotest\] result: OK" autotest.log
