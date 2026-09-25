@@ -61,6 +61,17 @@ func _build_buses() -> void:
 		_pan_bus_names.append(bus_name)
 
 
+func _exit_tree() -> void:
+	# Stop every voice so no stream playbacks are still alive at shutdown.
+	for p in _pool:
+		p.stop()
+		p.stream = null
+	if _ambient:
+		_ambient.stop()
+		_ambient.stream = null
+	streams.clear()
+
+
 func set_master_volume(v: float) -> void:
 	GameManager.settings["master_volume"] = clampf(v, 0.0, 1.0)
 	AudioServer.set_bus_volume_db(0, linear_to_db(maxf(0.0001, GameManager.settings["master_volume"])))

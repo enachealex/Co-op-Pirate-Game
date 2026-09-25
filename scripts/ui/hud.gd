@@ -312,7 +312,9 @@ func _draw_offscreen_markers() -> void:
 	var margin := 40.0
 	for it in items:
 		var sp: Vector2 = ((it[0] as Vector2) - center) * cam.zoom / ui_scale + size * 0.5
-		var inner := Rect2(Vector2(margin, 190.0), Vector2(size.x - margin * 2, size.y - 190.0 - 270.0))
+		var top := minf(190.0, size.y * 0.22)
+		var bottom := minf(270.0, size.y * 0.3)
+		var inner := Rect2(Vector2(margin, top), Vector2(size.x - margin * 2, size.y - top - bottom))
 		if inner.has_point(sp):
 			continue
 		var dirv := (sp - size * 0.5).normalized()
