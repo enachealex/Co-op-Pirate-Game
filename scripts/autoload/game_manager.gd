@@ -129,6 +129,13 @@ func register_sink(by_player: int) -> void:
 		raise_notoriety("Your raids are drawing the Armada's attention.")
 
 
+## Captured prizes count toward notoriety like kills, but not as "sunk".
+func register_capture(_by_player: int) -> void:
+	total_sunk += 1
+	if total_sunk % 6 == 0:
+		raise_notoriety("Your raids are drawing the Armada's attention.")
+
+
 func raise_notoriety(reason: String) -> void:
 	notoriety += 1
 	banner.emit("NOTORIETY %d" % notoriety, reason)
@@ -151,9 +158,10 @@ func bounty_claimed(_by_player: int, captured: bool) -> void:
 	var b := current_bounty()
 	var reward := int(b["reward"]) * (2 if captured else 1)
 	add_gold(reward, -1, "BOUNTY: %s" % b["captain"])
-	banner.emit("BOUNTY CLAIMED", "%s's %s %s" % [b["captain"], b["ship"], "captured!" if captured else "sent to the depths!"])
 	bounty_index += 1
-	raise_notoriety("The Armada sends a deadlier captain.")
+	notoriety += 1
+	banner.emit("BOUNTY CLAIMED", "%s's %s %s  -  Notoriety %d: the Armada sends a deadlier captain." % [
+		b["captain"], b["ship"], "captured!" if captured else "sent to the depths!", notoriety])
 	if bounty_index == ShipDB.BOUNTIES.size() and not victory_reached:
 		victory_reached = true
 		victory.emit()

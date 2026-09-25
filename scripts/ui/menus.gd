@@ -332,11 +332,18 @@ func hide_all() -> void:
 		f.release_focus()
 
 
-func _show(p: Control, with_bg: bool) -> void:
+func _show(p: Control, with_bg: bool, focus_delay: float = 0.0) -> void:
 	hide_all()
 	_bg.visible = with_bg
 	p.visible = true
-	_focus_first(p)
+	if focus_delay <= 0.0:
+		_focus_first(p)
+	else:
+		# Timer runs while paused; the panel only takes focus if it is still showing.
+		get_tree().create_timer(focus_delay, true).timeout.connect(func():
+			if p.visible:
+				_focus_first(p)
+		)
 
 
 func _focus_first(p: Control) -> void:
@@ -380,7 +387,7 @@ func show_victory() -> void:
 		lines.append("%s: %d sunk, %d captured, %d damage dealt" % [U.PLAYER_NAMES[p.idx], p.sunk, p.captured, int(p.damage_dealt)])
 	lines.append("Treasury: %s gold   Voyage time: %d min" % [U.fmt_gold(GameManager.treasury), int(GameManager.voyage_time / 60.0)])
 	_victory_stats.text = "\n".join(lines)
-	_show(_victory_panel, false)
+	_show(_victory_panel, false, 1.0)
 
 
 func toggle_help_overlay() -> void:

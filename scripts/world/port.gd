@@ -49,7 +49,7 @@ func tick(dt: float) -> void:
 		var d: float = p.global_position.distance_to(global_position)
 		p.in_safe_zone = d < SAFE_RADIUS
 		var was: bool = p.docked
-		p.docked = d < DOCK_RADIUS and p.velocity.length() < DOCK_MAX_SPEED
+		p.docked = d < DOCK_RADIUS and (p.shop_open or p.velocity.length() < DOCK_MAX_SPEED)
 		if p.dismasted and p.in_safe_zone:
 			p.on_docked()
 		if p.docked and not was:

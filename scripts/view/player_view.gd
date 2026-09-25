@@ -62,6 +62,8 @@ func set_ui_scale(s: float) -> void:
 	if hud_layer:
 		hud_layer.scale = Vector2(s, s)
 		hud.ui_scale = s
+		hud.size = Vector2(viewport.size) / maxf(0.01, s)
+		hud.queue_redraw()
 
 
 func _process(_delta: float) -> void:

@@ -36,6 +36,7 @@ var _side := 1.0                   # +1 = keep target on starboard, -1 = port
 var _avoid_bias := 1.0
 var _prize_t := 0.0
 var _desired := 0.0
+var _abandon_t := 0.0
 
 
 func setup_enemy(p_template: String, notoriety: int, p_world: Node, hp_bonus: float = 1.0) -> void:
@@ -105,6 +106,21 @@ func ai_tick(dt: float) -> void:
 			sail_index = 1
 			thrust_mult = 0.0
 			steer_input = 0.0
+	if disabled:
+		_abandon_tick(dt)
+
+
+## A disabled ship nobody comes back for eventually limps out of the sector,
+## so it stops holding a convoy slot.
+func _abandon_tick(dt: float) -> void:
+	var near := false
+	for p in world.players:
+		if is_instance_valid(p) and p.is_active() and p.global_position.distance_to(global_position) < U.DETECTION_RADIUS * 2.0:
+			near = true
+			break
+	_abandon_t = 0.0 if near else _abandon_t + dt
+	if _abandon_t > 25.0:
+		escaped = true
 
 
 func _decide() -> void:
@@ -118,6 +134,8 @@ func _decide() -> void:
 				b.cancel()
 				b.enabled = false
 			world.effects.text(global_position + Vector2(0, -40), "DISABLED", Color("d0d0d0"), 18)
+			if group != null:
+				group.on_member_disabled(self)
 		if _allies_fighting():
 			state = AI.FLEE
 		else:
@@ -239,7 +257,8 @@ func _patrol(dt: float) -> void:
 	# Keep formation: slow down when ahead of the slot, speed up when behind.
 	var to_goal := goal - global_position
 	sail_index = 3
-	if group != null and group.leader != self and is_instance_valid(group.leader):
+	if group != null and group.leader != self and is_instance_valid(group.leader) \
+			and not group.leader.disabled and not group.leader.sinking:
 		var slot: Vector2 = group.leader.global_position + _formation_offset_world(group.leader.rotation)
 		var ahead := forward().dot(global_position - slot)
 		if ahead > 30.0:
@@ -487,14 +506,17 @@ func retreat() -> void:
 
 func _on_sunk(info: Dictionary) -> void:
 	var by := int(info.get("player_idx", -1))
-	if by < 0:
+	if by < 0 and maxf(last_hit_by[0], last_hit_by[1]) >= 0.0:
 		# Credit whoever dealt the most recent hit.
 		by = 0 if last_hit_by[0] >= last_hit_by[1] else 1
 		if by >= GameManager.player_count:
 			by = 0
 	world.loot.drop_for(global_position, crate_count, gold_reward, rich)
 	GameManager.register_sink(by)
-	GameManager.notify(-1, "%s sunk the %s!" % [U.PLAYER_NAMES[by], display_name], Color("ffd34d"))
+	if by >= 0:
+		GameManager.notify(-1, "%s sunk the %s!" % [U.PLAYER_NAMES[by], display_name], Color("ffd34d"))
+	else:
+		GameManager.notify(-1, "Haven's shore batteries sank the %s!" % display_name, Color("ffd34d"))
 	if is_bounty:
 		GameManager.bounty_claimed(by, false)
 	if group != null:

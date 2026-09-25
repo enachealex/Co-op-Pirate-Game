@@ -255,7 +255,7 @@ func _capture(target: EnemyShip, boarders: Array[PlayerShip]) -> void:
 	effects.text(target.global_position + Vector2(0, -40), "CAPTURED!", Color("7dff9a"), 30, 2.0)
 	GameManager.notify(-1, "%s captured the %s! +%d cargo, +%d repair kit%s" % [lead.display_name, target.display_name, goods, kits, "" if kits == 1 else "s"], Color("7dff9a"))
 	Sfx.at("bell", target.global_position, 0.0)
-	GameManager.register_sink(lead.idx)
+	GameManager.register_capture(lead.idx)
 	if target.is_bounty:
 		GameManager.bounty_claimed(lead.idx, true)
 	if target.group != null:

@@ -70,7 +70,7 @@ class BotInput:
 				desired = s * deg_to_rad(90.0)
 			if best.get("disabled"):
 				desired = 0.0
-			if bd < float(ship.stats["range"]):
+			if bd < float(ship.stats["range"]) and _frame % 2 == 0:
 				_now["fire_port"] = true
 				_now["fire_starboard"] = true
 				_now["fire_bow"] = true

@@ -30,6 +30,13 @@ class Group:
 					leader = o
 					break
 
+	func on_member_disabled(s: Node) -> void:
+		if s == leader:
+			for o in ships:
+				if is_instance_valid(o) and o != s and not o.sinking and not o.disabled:
+					leader = o
+					return
+
 	func all_close(ldr: Node) -> bool:
 		for s in ships:
 			if is_instance_valid(s) and s != ldr and not s.sinking and not s.disabled:

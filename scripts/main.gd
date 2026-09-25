@@ -167,6 +167,9 @@ func pause() -> void:
 
 func resume() -> void:
 	get_tree().paused = false
+	if world:
+		for p in world.players:
+			p.fire_lock = true
 	GameManager.set_state(GameManager.State.PLAYING)
 	menus.hide_all()
 

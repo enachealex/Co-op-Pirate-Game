@@ -27,6 +27,9 @@ var boarding_target: Ship = null
 var boarding_t := 0.0
 var repair_t := 0.0
 var prompts: Array[String] = []
+## Set when the depot closes or the game resumes: the key that confirmed a menu
+## choice may double as a fire key, so guns stay silent until fire keys are released.
+var fire_lock := false
 var _hold_full_warned := 0.0
 var _no_chaser_warned := 0.0
 
@@ -90,17 +93,22 @@ func control_tick(dt: float) -> void:
 	if shop_open:
 		steer_input = 0.0
 		sail_index = 1
+		fire_lock = true
 		return
 	if boarding_target != null:
 		steer_input = 0.0
 		_boarding_tick(dt)
 		return
 	steer_input = input.steer()
+	if fire_lock and not (input.held("fire_port") or input.held("fire_starboard") \
+			or input.held("fire_bow") or input.held("fire_aim")):
+		fire_lock = false
 	if not dismasted:
 		if input.just_pressed("sail_up"):
 			sail_index = mini(3, sail_index + 1)
 		if input.just_pressed("sail_down"):
 			sail_index = maxi(0, sail_index - 1)
+	if not dismasted and not fire_lock:
 		if input.held("fire_port"):
 			_fire("port")
 		if input.held("fire_starboard"):
@@ -109,7 +117,7 @@ func control_tick(dt: float) -> void:
 			_fire("bow")
 		if input.held("fire_aim"):
 			_fire_aimed()
-	else:
+	if dismasted:
 		sail_index = 1
 	_context_actions()
 	if repair_t > 0.0:
